@@ -300,4 +300,4 @@ def enable_protection():
     response.headers['Server'] = 'Leaky'
     response.headers['X-Powered-By'] = 'Leaky'
 
-run(app=app, host="127.0.0.1", port=9999)
+run(app=app, host="0.0.0.0", port=9999)
