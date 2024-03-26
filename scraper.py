@@ -89,8 +89,13 @@ def index():
         query_conditions = {}
 
         if query:
-            query_conditions["$text"] = {"$search": query}
-
+            if query.isdigit():
+                try:
+                    query_conditions["$expr"] = {"$eq": [{"$toInt": "$p"}, int(query)]}
+                except ValueError:
+                    pass  # Ignore invalid numeric strings
+                else:
+                    query_conditions["$text"] = {"$search": query}
         if domain_query:
             query_conditions["d"] = {"$regex": re.escape(domain_query)}
 
