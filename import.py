@@ -31,14 +31,30 @@ def import_credentials(file_path, leak_name, leak_date):
             if line:
                 parts = line.split(":")
                 if len(parts) == 2:
-                    email, password = parts[0], parts[1]
-                    email_parts = email.split("@")
-                    if len(email_parts) == 2:
-                        username, domain = email_parts[0], email_parts[1]
+                    if '@' in parts[0]:  # Check if the line contains an email
+                        email, password = parts[0], parts[1]
+                        email_parts = email.split("@")
+                        if len(email_parts) == 2:
+                            username, domain = email_parts[0], email_parts[1]
+                            credential = {
+                                "l": new_id,
+                                "p": username,
+                                "d": domain, 
+                                "P": password,
+                                "leakname": leak_name,
+                                "date": leak_date
+                            }
+                            credentials.insert_one(credential)
+                            imported_count += 1
+                        else:
+                            print(f"Skipped line due to bad email: {line}")
+                            skipped_count += 1
+                    elif parts[0].isdigit():  # Check if the line contains only digits
+                        password = parts[1]
                         credential = {
                             "l": new_id,
-                            "p": username,
-                            "d": domain, 
+                            "p": None,
+                            "d": None, 
                             "P": password,
                             "leakname": leak_name,
                             "date": leak_date
@@ -46,7 +62,7 @@ def import_credentials(file_path, leak_name, leak_date):
                         credentials.insert_one(credential)
                         imported_count += 1
                     else:
-                        print(f"Skipped line due to bad email: {line}")
+                        print(f"Skipped line: {line}")
                         skipped_count += 1
                 else:
                     print(f"Skipped line due to wrong parts: {line}")
